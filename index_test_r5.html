@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>作文教學工具產生器 (教師版)</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.7;
+            color: #333;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        h1, h2, h3 {
+            color: #0056b3;
+            border-bottom: 2px solid #0056b3;
+            padding-bottom: 10px;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+        input[type="text"], input[type="password"], select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+        .api-key-note {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 8px;
+        }
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+        }
+        .checkbox-group label {
+            font-weight: normal;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1em;
+        }
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>作文教學工具產生器 (教師版) ✍️</h1>
+        <p>請為您的學生設定本次作文的各項參數。完成後，點擊最下方的按鈕，即可產生一份專屬的學生作文輔助網頁。</p>
+        
+        <form id="teacher-form">
+            
+            <div class="form-group full-width">
+                <label for="api-key">1. Gemini API 金鑰 (API Key)</label>
+                <input type="password" id="api-key" required placeholder="請在此輸入您的 Google AI Gemini API Key">
+                <p class="api-key-note">此金鑰將被嵌入學生頁面中以啟用 AI 功能。請確保其權限安全，並建議僅供本次教學使用。</p>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="composition-title">2. 作文題目</label>
+                    <input type="text" id="composition-title" required placeholder="例如：我最快樂的一天">
+                </div>
+
+                <div class="form-group">
+                    <label for="student-level">3. 學生年級</label>
+                    <select id="student-level">
+                        <option value="四年級">四年級</option>
+                        <option value="五年級">五年級</option>
+                        <option value="六年級">六年級</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="word-count">4. 字數要求</label>
+                    <select id="word-count">
+                        <option value="100">100字</option>
+                        <option value="500">500字</option>
+                        <option value="800">800字</option>
+                        <option value="1000">1000字</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="composition-style">5. 文體</label>
+                    <select id="composition-style">
+                        <option value="記敘文本">記敘文本</option>
+                        <option value="抒情文本">抒情文本</option>
+                        <option value="應用文本">應用文本</option>
+                        <option value="說明文本">說明文本</option>
+                        <option value="議論文本">議論文本</option>
+                        <option value="詩歌">詩歌</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="composition-structure">6. 結構</label>
+                    <select id="composition-structure">
+                        <option value="時間順序式">時間順序式</option>
+                        <option value="起承轉合式">起承轉合式</option>
+                        <option value="總分總式">總分總式</option>
+                        <option value="對比式">對比式</option>
+                        <option value="問題解決式">問題解決式</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="reference-figure">7. 參考圖表</label>
+                    <select id="reference-figure">
+                        <option value="心智圖">心智圖</option>
+                        <option value="流程圖">流程圖</option>
+                        <option value="金字塔圖">金字塔圖</option>
+                        <option value="三明治圖">三明治圖</option>
+                        <option value="四格圖">四格圖</option>
+                        <option value="魚骨圖">魚骨圖</option>
+                        <option value="時間軸">時間軸</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group full-width">
+                <label>8. 寫作技巧 (可複選)</label>
+                <div class="checkbox-group" id="composition-skills">
+                    <label><input type="checkbox" value="開頭技巧"> 開頭技巧</label>
+                    <label><input type="checkbox" value="結尾技巧"> 結尾技巧</label>
+                    <label><input type="checkbox" value="描寫技巧"> 描寫技巧</label>
+                </div>
+            </div>
+
+            <div class="form-group full-width">
+                <label>9. 建議語詞 (可複選)</label>
+                <div class="checkbox-group" id="suggested-phrases">
+                    <label><input type="checkbox" value="語詞"> 語詞</label>
+                    <label><input type="checkbox" value="四字語詞"> 四字語詞</label>
+                    <label><input type="checkbox" value="成語"> 成語</label>
+                    <label><input type="checkbox" value="名言佳句"> 名言佳句</label>
+                </div>
+            </div>
+
+            <div class="form-group full-width">
+                <label>10. 建議句式 (可複選)</label>
+                <div class="checkbox-group" id="sentence-styles">
+                    <label><input type="checkbox" value="並列"> 並列</label>
+                    <label><input type="checkbox" value="承接"> 承接</label>
+                    <label><input type="checkbox" value="轉折"> 轉折</label>
+                    <label><input type="checkbox" value="遞進"> 遞進</label>
+                    <label><input type="checkbox" value="選擇"> 選擇</label>
+                    <label><input type="checkbox" value="假設"> 假設</label>
+                    <label><input type="checkbox" value="條件"> 條件</label>
+                    <label><input type="checkbox" value="因果"> 因果</label>
+                    <label><input type="checkbox" value="目的"> 目的</label>
+                </div>
+            </div>
+
+            <div class="form-group full-width">
+                <label>11. 建議修辭 (可複選)</label>
+                <div class="checkbox-group" id="rhetoric-devices">
+                    <label><input type="checkbox" value="譬喻"> 譬喻</label>
+                    <label><input type="checkbox" value="擬人"> 擬人</label>
+                    <label><input type="checkbox" value="誇飾"> 誇飾</label>
+                    <label><input type="checkbox" value="類疊"> 類疊</label>
+                    <label><input type="checkbox" value="排比"> 排比</label>
+                    <label><input type="checkbox" value="雙關"> 雙關</label>
+                    <label><input type="checkbox" value="映襯"> 映襯</label>
+                    <label><input type="checkbox" value="摹寫"> 摹寫</label>
+                </div>
+            </div>
+            
+            <button type="submit">產生學生作文工具</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('teacher-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            try {
+                const getCheckedValues = (selector) => 
+                    Array.from(document.querySelectorAll(`${selector}:checked`)).map(cb => cb.value);
+
+                const config = {
+                    apiKey: document.getElementById('api-key').value,
+                    title: document.getElementById('composition-title').value,
+                    level: document.getElementById('student-level').value,
+                    wordCount: document.getElementById('word-count').value,
+                    style: document.getElementById('composition-style').value,
+                    structure: document.getElementById('composition-structure').value,
+                    figure: document.getElementById('reference-figure').value,
+                    skills: getCheckedValues('#composition-skills input'),
+                    phrases: getCheckedValues('#suggested-phrases input'),
+                    sentences: getCheckedValues('#sentence-styles input'),
+                    rhetoric: getCheckedValues('#rhetoric-devices input'),
+                };
+
+                if (!config.apiKey || !config.title) {
+                    alert('錯誤：請務必填寫「API 金鑰」和「作文題目」！');
+                    return;
+                }
+
+                // Generate and download the file
+                const studentPageHTML = generateStudentPage(config);
+                const blob = new Blob([studentPageHTML], { type: 'text/html;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'Student_Composition_Tool.html';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+            } catch (error) {
+                console.error('Failed to generate student page:', error);
+                alert(`產生頁面時發生錯誤，請檢查瀏覽器控制台以獲取詳細資訊。\n錯誤訊息: ${error.message}`);
+            }
+        });
+
+        function generateStudentPage(config) {
+            const createGuidanceSection = (title, id, selections) => {
+                if (!selections || selections.length === 0) return '';
+                return `
+                    <div class="column">
+                        <h2>${title}</h2>
+                        <div id="${id}" class="guidance-content loading">AI 正在產生範例...</div>
+                    </div>`;
+            };
+
+            // The entire student page HTML is returned as a single template string
+            return `
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Composition Tool</title>
+    <style>
+        body { font-family: 'Microsoft JhengHei', sans-serif; margin: 0; padding: 20px; background-color: #f4f7f6; color: #333; }
+        .header { text-align: center; margin-bottom: 30px; padding: 25px; background-color: #0056b3; color: white; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h1 { margin: 0; font-size: 2.2em; }
+        .info-bar { display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; margin-top: 15px; }
+        .info-item { background-color: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 15px; font-size: 1.1em; }
+        .main-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; }
+        .column { background-color: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 25px; }
+        .full-span { grid-column: 1 / -1; }
+        h2 { color: #0056b3; border-bottom: 2px solid #e0e0e0; padding-bottom: 10px; margin-top: 0; }
+        h3 { color: #007bff; margin-top: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; color: #555; }
+        textarea { width: 100%; height: 200px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; resize: vertical; font-size: 1em; }
+        #word-count-display { text-align: right; color: #888; font-size: 0.9em; margin-top: 5px; }
+        .guidance-content { white-space: pre-wrap; line-height: 1.8; }
+        .guidance-content ul { padding-left: 20px; }
+        .guidance-content li { margin-bottom: 10px; }
+        .guidance-content.loading::after { content: '⏳'; display: inline-block; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #final-output { white-space: pre-wrap; background-color: #e9f5ff; border-left: 5px solid #007bff; padding: 15px; border-radius: 5px; min-height: 150px; font-size: 1.1em; line-height: 1.7; margin-top: 15px; }
+        button { display: block; width: 100%; padding: 12px; background-color: #28a745; color: white; border: none; border-radius: 5px; font-size: 1.2em; cursor: pointer; transition: background-color 0.3s; margin-top: 10px; }
+        button:hover:not(:disabled) { background-color: #218838; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+        pre { background-color: #f0f0f0; padding: 15px; border-radius: 5px; font-family: monospace; white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>${config.title}</h1>
+        <div class="info-bar">
+            <span class="info-item">年級: ${config.level}</span>
+            <span class="info-item">字數: ${config.wordCount}字</span>
+            <span class="info-item">文體: ${config.style}</span>
+            <span class="info-item">結構: ${config.structure}</span>
+        </div>
+    </div>
+    <div class="main-container">
+        <div class="column">
+            <h2>參考圖表：${config.figure}</h2>
+            <div id="figure-guidance" class="guidance-content loading">AI 正在產生說明...</div>
+        </div>
+        ${createGuidanceSection('寫作技巧', 'skills-guidance', config.skills)}
+        ${createGuidanceSection('建議語詞', 'phrases-guidance', config.phrases)}
+        ${createGuidanceSection('建議句式', 'sentences-guidance', config.sentences)}
+        ${createGuidanceSection('建議修辭', 'rhetoric-guidance', config.rhetoric)}
+
+        <div class="column full-span">
+            <h2>我的草稿</h2>
+            <label for="composition-draft">請在此輸入你的作文草稿 (最多 ${config.wordCount} 字)</label>
+            <textarea id="composition-draft" maxlength="${config.wordCount}" placeholder="將你的想法寫在這裡..."></textarea>
+            <div id="word-count-display">0 / ${config.wordCount}</div>
+            <label for="text-upload" style="margin-top: 15px;">或上傳文字檔 (.txt):</label>
+            <input type="file" id="text-upload" accept=".txt">
+        </div>
+
+        <div class="column full-span">
+            <h2>Gemini 作文建議</h2>
+            <button id="generate-btn">產生完整作文</button>
+            <div id="final-output">AI 產生的完整文章將顯示於此...</div>
+        </div>
+    </div>
+
+    <script>
+        const teacherConfig = ${JSON.stringify(config, null, 2)};
+        const API_KEY = teacherConfig.apiKey;
+        const API_URL = \`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=\${API_KEY}\`;
+
+        const draftTextarea = document.getElementById('composition-draft');
+        const wordCountDisplay = document.getElementById('word-count-display');
+        const generateBtn = document.getElementById('generate-btn');
+        const finalOutput = document.getElementById('final-output');
+        const textFileInput = document.getElementById('text-upload');
+
+        async function callGemini(prompt, isStreaming = false) {
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: {
+                    temperature: 0.7,
+                    topP: 0.95,
+                    topK: 40,
+                }
+            };
+            if (!isStreaming) {
+                payload.generationConfig.responseMimeType = "application/json";
+            }
+            
+            const endpoint = isStreaming ? API_URL.replace(':generateContent',':streamGenerateContent') : API_URL;
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) {
+                    const errorBody = await response.json();
+                    throw new Error(\`API Error: \${errorBody.error.message}\`);
+                }
+                return response;
+            } catch (error) {
+                console.error("Gemini API call failed:", error);
+                throw error;
+            }
+        }
+        
+        async function populateGuidance() {
+            const guidancePrompt = \`
+                你是一位專業且友善的國小作文老師，擅長使用繁體中文。請為一位小學生提供作文指導。
+
+                **作文基本資料:**
+                * 題目: "\${teacherConfig.title}"
+                * 年級: \${teacherConfig.level}
+                * 文體: \${teacherConfig.style}
+                * 結構: \${teacherConfig.structure}
+
+                **任務:**
+                請根據以下要求，提供清晰、簡單的範例。請嚴格依照下面的說明，回傳一個 JSON 格式的物件。
+
+                **JSON 結構與要求:**
+                {
+                    "referenceFigure": {
+                        "explanation": "針對「\${teacherConfig.figure}」，寫一段簡短說明，解釋如何運用這個圖表來構思「\${teacherConfig.title}」這篇作文。",
+                        "diagram": "用文字或符號，畫出一個簡單的「\${teacherConfig.figure}」圖表示範，內容需與題目「\${teacherConfig.title}」相關。"
+                    },
+                    "compositionSkills": {
+                        ${teacherConfig.skills.map(skill => `"${skill}": "針對「${skill}」，寫一個與題目相關的簡短範例和說明。"`).join(',\n')}
+                    },
+                    "suggestedPhrases": {
+                        ${teacherConfig.phrases.map(phrase => `"${phrase}": ["請提供3-4個和題目相關的「${phrase}」範例。"]`).join(',\n')}
+                    },
+                    "sentenceStyles": {
+                        ${teacherConfig.sentences.map(sentence => `"${sentence}": "請用「${sentence}」句式，寫一個與題目相關的範例句子。"`).join(',\n')}
+                    },
+                    "rhetoricDevices": {
+                        ${teacherConfig.rhetoric.map(device => `"${device}": "請用「${device}」修辭，寫一個與題目相關的範例句子。"`).join(',\n')}
+                    }
+                }
+            \`;
+            try {
+                const response = await callGemini(guidancePrompt, false);
+                const result = await response.json();
+                const guidanceData = JSON.parse(result.candidates[0].content.parts[0].text);
+                
+                const render = (elementId, content) => {
+                    const el = document.getElementById(elementId);
+                    if (el) {
+                        el.innerHTML = content;
+                        el.classList.remove('loading');
+                    }
+                };
+                
+                if (guidanceData.referenceFigure) {
+                    render('figure-guidance', \`<h3>說明：</h3><p>\${guidanceData.referenceFigure.explanation}</p><h3>圖表示範：</h3><pre>\${guidanceData.referenceFigure.diagram}</pre>\`);
+                }
+                
+                const renderSimpleSections = (data, elementId) => {
+                    if (data && Object.keys(data).length > 0) {
+                        let html = '';
+                        for (const [key, value] of Object.entries(data)) {
+                            html += \`<h3>\${key}</h3>\`;
+                            if (Array.isArray(value)) {
+                                html += \`<ul>\${value.map(item => \`<li>\${item}</li>\`).join('')}</ul>\`;
+                            } else {
+                                html += \`<p>\${value}</p>\`;
+                            }
+                        }
+                        render(elementId, html);
+                    } else {
+                        const el = document.getElementById(elementId);
+                        if(el) el.parentElement.style.display = 'none';
+                    }
+                };
+
+                renderSimpleSections(guidanceData.compositionSkills, 'skills-guidance');
+                renderSimpleSections(guidanceData.suggestedPhrases, 'phrases-guidance');
+                renderSimpleSections(guidanceData.sentenceStyles, 'sentences-guidance');
+                renderSimpleSections(guidanceData.rhetoricDevices, 'rhetoric-guidance');
+
+            } catch(error) {
+                document.querySelectorAll('.guidance-content').forEach(el => {
+                    el.innerHTML = \`產生範例時發生錯誤：\${error.message}\`;
+                    el.classList.remove('loading');
+                });
+            }
+        }
+
+        draftTextarea.addEventListener('input', () => {
+            wordCountDisplay.textContent = \`\${draftTextarea.value.length} / \${teacherConfig.wordCount}\`;
+        });
+
+        textFileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                draftTextarea.value = e.target.result.slice(0, teacherConfig.wordCount);
+                draftTextarea.dispatchEvent(new Event('input'));
+            };
+            reader.readAsText(file);
+        });
+
+        generateBtn.addEventListener('click', async () => {
+            generateBtn.disabled = true;
+            finalOutput.textContent = 'AI 老師正在批改與發想，請稍候... ⏳';
+
+            const studentDraft = draftTextarea.value.trim();
+            if (!studentDraft) {
+                alert('請先在草稿區寫下你的想法喔！');
+                generateBtn.disabled = false;
+                finalOutput.textContent = '請先輸入草稿，再產生完整作文。';
+                return;
+            }
+
+            const finalPrompt = \`
+                你是一位頂尖的國小作文指導老師。請根據以下所有資訊，為學生寫一篇優秀的範文。
+                **1. 作文規定:**
+                * 題目: "\${teacherConfig.title}"
+                * 年級: \${teacherConfig.level}
+                * 字數: 約 \${teacherConfig.wordCount} 字
+                * 文體: \${teacherConfig.style}
+                * 結構: \${teacherConfig.structure}
+                **2. 寫作指導方針 (請在文章中盡量運用這些元素):**
+                * 參考圖表概念: \${teacherConfig.figure}
+                * 技巧: \${teacherConfig.skills.join(', ') || '無'}
+                * 語詞: \${teacherConfig.phrases.join(', ') || '無'}
+                * 句式: \${teacherConfig.sentences.join(', ') || '無'}
+                * 修辭: \${teacherConfig.rhetoric.join(', ') || '無'}
+                **3. 學生草稿 (這是核心，請以此為基礎進行擴寫、潤飾與優化):**
+                ---
+                \${studentDraft}
+                ---
+                **任務:**
+                請整合以上所有規定、方針和學生的草稿，寫出一篇流暢、生動、符合題目要求、且結構完整的範文。文章需符合學生的年級程度，用詞優美但不過度艱深。
+            \`;
+            
+            try {
+                const response = await callGemini(finalPrompt, true);
+                finalOutput.textContent = '';
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    const chunk = decoder.decode(value, { stream: true });
+                    const parts = chunk.match(/"text":\\s*"((?:[^"]|\\")*)"/g);
+                    if (parts) {
+                       parts.forEach(part => {
+                           try {
+                               finalOutput.textContent += JSON.parse(part.substring(part.indexOf(':') + 1));
+                           } catch(e) {}
+                       });
+                    }
+                }
+            } catch (error) {
+                finalOutput.textContent = \`產生作文時發生錯誤：\${error.message}\`;
+            } finally {
+                generateBtn.disabled = false;
+            }
+        });
+        
+        window.addEventListener('load', populateGuidance);
+    </script>
+</body>
+</html>`;
+        }
+    </script>
+</body>
+</html>
